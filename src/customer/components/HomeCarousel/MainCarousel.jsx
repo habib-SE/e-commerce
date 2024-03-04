@@ -11,7 +11,12 @@ const MainCarousel = () => {
 
   return (
     <div className=' container items-center'>
-      <AliceCarousel items={items} />
+      <AliceCarousel items={items}
+      disableButtonsControls
+      autoPlay
+      autoPlayInterval={1000}
+      infinite
+      />
     </div>
   );
 };
