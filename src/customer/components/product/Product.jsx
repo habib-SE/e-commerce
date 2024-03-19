@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import {
   Dialog,
   Disclosure,
@@ -18,6 +18,8 @@ import { mens_kurta } from "../../../Data/Men/men_kurta";
 import ProductCard from "./ProductCard";
 import { filters, singleFilter } from "./FilterData";
 import { FormControlLabel, Radio } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const sortOptions = [
   { name: "Price: Low to High", href: "#", current: false },
@@ -30,6 +32,59 @@ function classNames(...classes) {
 
 export default function Product() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Initialize state for selected filters
+  const [selectedFilters, setSelectedFilters] = useState({});
+
+  // Parse query parameters on component mount
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const initialSelectedFilters = {};
+    filters.forEach((section) => {
+      section.options.forEach((option) => {
+        const paramValue = searchParams.get(option.value);
+        if (paramValue) {
+          initialSelectedFilters[option.value] = true;
+        }
+      });
+    });
+    setSelectedFilters(initialSelectedFilters);
+  }, [location.search]);
+
+  // Update selected filters in URL
+  const updateFiltersInUrl = () => {
+    const searchParams = new URLSearchParams();
+    Object.keys(selectedFilters).forEach((filter) => {
+      if (selectedFilters[filter]) {
+        searchParams.append(filter, "true");
+      }
+    });
+    navigate(`${location.pathname}?${searchParams.toString()}`);
+  };
+
+  // Handle filter selection/deselection
+  const handleFilterChange = (event, sectionId) => {
+    const { checked, value } = event.target;
+    setSelectedFilters((prevFilters) => ({
+      ...prevFilters,
+      [value]: checked,
+    }));
+  };
+
+  useEffect(() => {
+    updateFiltersInUrl();
+  }, [selectedFilters]);
+
+  // Function to handle deselection of filters
+  const handleDeselectFilter = (filter) => {
+    setSelectedFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters };
+      delete updatedFilters[filter];
+      return updatedFilters;
+    });
+  };
 
   return (
     <div className="bg-white">
@@ -120,64 +175,10 @@ export default function Product() {
                                       name={`${section.id}[]`}
                                       defaultValue={option.value}
                                       type="checkbox"
-                                      defaultChecked={option.checked}
-                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <label
-                                      htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
-                                      className="ml-3 min-w-0 flex-1 text-gray-500"
-                                    >
-                                      {option.label}
-                                    </label>
-                                  </div>
-                                ))}
-                              </div>
-                            </Disclosure.Panel>
-                          </>
-                        )}
-                      </Disclosure>
-                    ))}
-                    {singleFilter.map((section) => (
-                      <Disclosure
-                        as="div"
-                        key={section.id}
-                        className="border-t border-gray-200 px-4 py-6"
-                      >
-                        {({ open }) => (
-                          <>
-                            <h3 className="-mx-2 -my-3 flow-root">
-                              <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                                <span className="font-medium text-gray-900">
-                                  {section.name}
-                                </span>
-                                <span className="ml-6 flex items-center">
-                                  {open ? (
-                                    <MinusIcon
-                                      className="h-5 w-5"
-                                      aria-hidden="true"
-                                    />
-                                  ) : (
-                                    <PlusIcon
-                                      className="h-5 w-5"
-                                      aria-hidden="true"
-                                    />
-                                  )}
-                                </span>
-                              </Disclosure.Button>
-                            </h3>
-                            <Disclosure.Panel className="pt-6">
-                              <div className="space-y-6">
-                                {section.options.map((option, optionIdx) => (
-                                  <div
-                                    key={option.value}
-                                    className="flex items-center"
-                                  >
-                                    <input
-                                      id={`filter-mobile-${section.id}-${optionIdx}`}
-                                      name={`${section.id}[]`}
-                                      defaultValue={option.value}
-                                      type="checkbox"
-                                      defaultChecked={option.checked}
+                                      checked={selectedFilters[option.value]}
+                                      onChange={(event) =>
+                                        handleFilterChange(event, section.id)
+                                      }
                                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
                                     <label
@@ -202,7 +203,10 @@ export default function Product() {
         </Transition.Root>
 
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
+          <div
+            className="flex items-baseline justify-between border-b border-gray-200
+pb-6 pt-24"
+          >
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
               New Arrivals
             </h1>
@@ -278,9 +282,6 @@ export default function Product() {
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5">
               <div>
-              <h1 className=" text-lg opacity-50 font-bold">Fillters</h1>
-              <form className="hidden lg:block">
-                {/* Mapping over filters */}
                 {filters.map((section) => (
                   <Disclosure
                     as="div"
@@ -289,7 +290,7 @@ export default function Product() {
                   >
                     {({ open }) => (
                       <>
-                        <h3 className=" -my-3 flow-root">
+                        <h3 className="-my-3 flow-root">
                           <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
                             <span className="font-medium text-gray-900">
                               {section.name}
@@ -316,17 +317,23 @@ export default function Product() {
                                 key={option.value}
                                 className="flex items-center"
                               >
-                                <RadioGroup
-                                  aria-labelledby={`filter-mobile-${section.id}-${optionIdx}`}
-                                  defaultValue={option.value}
+                                <input
+                                  id={`filter-${section.id}-${optionIdx}`}
                                   name={`${section.id}[]`}
+                                  defaultValue={option.value}
+                                  type="checkbox"
+                                  checked={selectedFilters[option.value]}
+                                  onChange={(event) =>
+                                    handleFilterChange(event, section.id)
+                                  }
+                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                />
+                                <label
+                                  htmlFor={`filter-${section.id}-${optionIdx}`}
+                                  className="ml-3 min-w-0 flex-1 text-gray-500"
                                 >
-                                  <FormControlLabel
-                                    value={option.value}
-                                    control={<Radio />}
-                                    label={option.label}
-                                  />
-                                </RadioGroup>
+                                  {option.label}
+                                </label>
                               </div>
                             ))}
                           </div>
@@ -335,7 +342,6 @@ export default function Product() {
                     )}
                   </Disclosure>
                 ))}
-                {/* Mapping over single filters */}
                 {singleFilter.map((section) => (
                   <Disclosure
                     as="div"
@@ -365,35 +371,52 @@ export default function Product() {
                           </Disclosure.Button>
                         </h3>
                         <Disclosure.Panel className="pt-6">
-                          <div className="space-y-6">
-                            {section.options.map((option, optionIdx) => (
-                              <RadioGroup
-                                aria-labelledby={`filter-mobile-${section.id}-${optionIdx}`}
-                                defaultValue={option.value}
-                                name={`${section.id}[]`}
-                              >
-                                <FormControlLabel
+                          <RadioGroup
+                            value={selectedFilters[section.id]}
+                            onChange={(value) =>
+                              setSelectedFilters({
+                                ...selectedFilters,
+                                [section.id]: value,
+                              })
+                            }
+                          >
+                            <div className="space-y-4">
+                              {section.options.map((option, optionIdx) => (
+                                <RadioGroup.Option
                                   key={option.value}
                                   value={option.value}
-                                  control={<Radio />}
-                                  label={option.label}
-                                />
-                              </RadioGroup>
-                            ))}
-                          </div>
+                                >
+                                  {({ checked }) => (
+                                    <div className="flex items-center">
+                                      <Radio
+                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        checked={checked}
+                                        onChange={() => null}
+                                      />
+                                      <label
+                                        htmlFor={`filter-${section.id}-${optionIdx}`}
+                                        className="ml-3 min-w-0 flex-1 text-gray-500"
+                                      >
+                                        {option.label}
+                                      </label>
+                                    </div>
+                                  )}
+                                </RadioGroup.Option>
+                              ))}
+                            </div>
+                          </RadioGroup>
                         </Disclosure.Panel>
                       </>
                     )}
                   </Disclosure>
                 ))}
-              </form>
               </div>
-             
 
               <div className="lg:col-span-4 w-full">
                 {/* Displaying product cards */}
                 <div className="flex flex-wrap justify-center bg-white py-5">
-                  {/* Ensure mens_kurta is an array and not empty before mapping over it */}
+                  {/* Ensure mens_kurta is an array and not empty before mapping over
+it */}
                   {Array.isArray(mens_kurta) && mens_kurta.length > 0 ? (
                     mens_kurta.map((item, index) => (
                       <div
