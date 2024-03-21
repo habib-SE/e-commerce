@@ -86,6 +86,15 @@ export default function Product() {
     });
   };
 
+  // Radio Button Filter
+  const handleRadioFilterChange = (e, sectionId) => {
+    const value = e.target.value;
+    setSelectedFilters((prevFilters) => ({
+      ...prevFilters,
+      [sectionId]: value,
+    }));
+  };
+
   return (
     <div className="bg-white">
       <div>
@@ -203,7 +212,8 @@ export default function Product() {
         </Transition.Root>
 
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div
+         
+        <div
             className="flex items-baseline justify-between border-b border-gray-200
 pb-6 pt-24"
           >
@@ -390,8 +400,14 @@ pb-6 pt-24"
                                     <div className="flex items-center">
                                       <Radio
                                         className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                        checked={checked}
-                                        onChange={() => null}
+                                        checked={
+                                          selectedFilters[section.id] ===
+                                          option.value
+                                        }
+                                        onChange={(e) =>
+                                          handleRadioFilterChange(e, section.id)
+                                        }
+                                        value={option.value}
                                       />
                                       <label
                                         htmlFor={`filter-${section.id}-${optionIdx}`}
@@ -408,15 +424,15 @@ pb-6 pt-24"
                         </Disclosure.Panel>
                       </>
                     )}
-                  </Disclosure>
+                  </
+                  Disclosure>
                 ))}
               </div>
 
               <div className="lg:col-span-4 w-full">
                 {/* Displaying product cards */}
                 <div className="flex flex-wrap justify-center bg-white py-5">
-                  {/* Ensure mens_kurta is an array and not empty before mapping over
-it */}
+                  {/* Ensure mens_kurta is an array and not empty before mapping over it */}
                   {Array.isArray(mens_kurta) && mens_kurta.length > 0 ? (
                     mens_kurta.map((item, index) => (
                       <div
