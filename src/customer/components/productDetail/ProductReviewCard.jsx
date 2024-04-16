@@ -15,15 +15,15 @@ const ProductReviewCard = () => {
             </Avatar>
           </Box>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={4}>
           <div className=" space-y-2">
             <div>
               <p className=" font-semibold text-lg">Habib</p>
               <p className=" opacity-70">Jan 3, 2003</p>
             </div>
           </div>
-          <Rating value={4.5} name="half-rating" />
-          <p>Nice Short, I lvoe this shirt.</p>
+          <Rating value={4.5} name="half-rating" readOnly precision={.5} />
+          <p>Nice Shirt, I lvoe this shirt.</p>
         </Grid>
       </Grid>
     </div>
