@@ -6,6 +6,8 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useLocation, useNavigate } from 'react-router-dom';
+import DeleveryAddressForm from './DeleveryAddressForm';
+import OrderSummary from './OrderSummary';
 
 const steps = ['Login', 'Delivery Address', 'Order Summary', 'Payment'];
 
@@ -16,10 +18,11 @@ export default function Checkout() {
 
   React.useEffect(() => {
     const querysearch = new URLSearchParams(location.search);
-    const step = querysearch.get("step");
-    if (step !== null && !isNaN(step)) {
-      setActiveStep(parseInt(step, 10));
+    let step = querysearch.get("step");
+    if (step === null || isNaN(step) || parseInt(step) >= steps.length) {
+      step = 1; // Set default step to 1 if not provided or invalid
     }
+    setActiveStep(parseInt(step, 10));
   }, [location.search]);
 
   const handleStepClick = (stepIndex) => {
@@ -61,11 +64,12 @@ export default function Checkout() {
               >
                 Back
               </Button>
-              <Box sx={{ flex: '1 1 auto' }} />
-              <Button onClick={() => handleStepClick(activeStep + 1)}>
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-              </Button>
+              
+              
             </Box>
+            <div>
+              {activeStep === 1 ? <DeleveryAddressForm /> : <OrderSummary />}
+            </div>
           </React.Fragment>
         )}
       </Box>
