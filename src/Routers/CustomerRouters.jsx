@@ -13,9 +13,9 @@ const CustomerRouters = () => {
         <Navigation/>
       </div>
       <Routes>
-        {/* <Route path='/' element={<HomePage/>} />
-        <Route path='/cart' element={<Cart/>} /> */}
-        <Route path='/' element={<Product/>} />
+        <Route path='/' element={<HomePage/>} />
+        <Route path='/cart' element={<Cart/>} />
+        <Route path='/:lavelOne/:lavelTwo/:lavelThree' element={<Product/>} />
       </Routes>
       <div>
         <Footer/>
