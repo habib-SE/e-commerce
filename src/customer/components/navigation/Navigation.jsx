@@ -12,7 +12,7 @@ import { deepPurple } from "@mui/material/colors";
 import { NavigationData } from "./NavigationData";
 
 import classNames from "classnames";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 function ClassNames(...classes) {
   return classes.filter(Boolean).join("");
 }
@@ -381,9 +381,11 @@ const Navigation = () => {
                         }}
                       >
                         <MenuItem onClick={handleCloseUserUserMenu}>
-                          Profile
+                         <Link>
+                         Profile
+                         </Link> 
                         </MenuItem>
-                        <MenuItem>My Orders</MenuItem>
+                        <MenuItem><Link to={'/account/order'}>My Orders</Link></MenuItem>
                         <MenuItem>Logout</MenuItem>
                       </Menu>
                     </div>

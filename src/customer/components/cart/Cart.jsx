@@ -1,6 +1,7 @@
 import React from 'react'
 import CartItem from './CartItem'
 import { Button } from '@mui/material'
+import { Link } from 'react-router-dom'
 
 const Cart = () => {
   return (
@@ -33,7 +34,7 @@ const Cart = () => {
 
           </div>
           <Button variant='contained' className=' w-full mb-10' sx={{px:"2.5rem",py:"0.7rem", bgcolor:"#9155fd"}}>
-            Checkout
+           <Link to={'/checkout'}>Checkout</Link> 
           </Button>
         </div>
       </div>

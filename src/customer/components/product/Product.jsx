@@ -372,12 +372,13 @@ export default function Product() {
 
               {/* Product grid */}
               <div className="lg:col-span-4 w-full">
-                <div className=" flex flex-wrap justify-center bg-white py5">
-                  {mens_kurta.map((Item) => (
-                    <ProductCard Product={Item} />
-                  ))}
-                </div>
-              </div>
+  <div className="flex flex-wrap justify-center bg-white py-5">
+    {mens_kurta.map((item, index) => (
+      <ProductCard key={index} Product={item} />
+    ))}
+  </div>
+</div>
+
             </div>
           </section>
         </main>
