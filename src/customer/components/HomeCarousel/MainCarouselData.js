@@ -1,6 +1,19 @@
-// ImageFile.js
-import image1 from '../../assets/beautiful-fashion-woman-in-black-dress-stylish-girl-from-multicolored-paints-splash-of-watercolor-colored-drawing-realistic-illustration-of-paints-vector.jpg';
-import image2 from '../../assets/png-clipart-dress-red-gown-clothing-woman-dress-fashion-girl-thumbnail.png';
-import image3 from '../../assets/png-transparent-fashion-girl-long-haired-girl-drawing-girls-pink-dress-thumbnail.png';
 
-export const images = [image1, image2, image3];
+export const MainCarouselData = [
+    {
+        image:"https://www.ethnicplus.in/media/mageplaza/bannerslider/banner/image/1/0/10_5.jpg",
+        path:"/Women/clothing/lengha_choli"
+    },
+    {
+        image:"https://www.ethnicplus.in/media/mageplaza/bannerslider/banner/image/1/2/12_4.jpg",
+        path:"/Women/clothing/lengha_dress"
+    },
+    {
+        image:"https://www.ethnicplus.in/media/mageplaza/bannerslider/banner/image/9/_/9_8.jpg",
+        path:"/Women/clothing/lengha_dress"
+    },
+    {
+        image:"https://www.ethnicplus.in/media/mageplaza/bannerslider/banner/image/1/1/11_4.jpg",
+        path:"/Women/clothing/lengha_saree"
+    },
+]

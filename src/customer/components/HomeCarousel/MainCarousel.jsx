@@ -2,15 +2,17 @@
 import React from 'react';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
-import { images } from './MainCarouselData';
+import { MainCarouselData} from './MainCarouselData';
+import { useNavigate } from 'react-router-dom';
 
 const MainCarousel = () => {
-  const items = images.map((image, index) => (
-    <img key={index} src={image} alt={`Image ${index + 1}`} style={{ width: '20%' }} />
-  ));
+  
+  const items = MainCarouselData.map((item, index) => 
+    <img key={index} className='cursor-pointer' role='presentation' src={item.image} alt={`Image ${index + 1}`} style={{ width: '100%' }} />
+  );
 
   return (
-    <div className=' container items-center'>
+    <div>
       <AliceCarousel items={items}
       disableButtonsControls
       autoPlay

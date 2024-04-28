@@ -1,11 +1,5 @@
-import React, { Fragment, useState, useEffect } from "react";
-import {
-  Dialog,
-  Disclosure,
-  Menu,
-  RadioGroup,
-  Transition,
-} from "@headlessui/react";
+import { Fragment, useState } from "react";
+import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
   ChevronDownIcon,
@@ -17,13 +11,11 @@ import {
 import { mens_kurta } from "../../../Data/Men/men_kurta";
 import ProductCard from "./ProductCard";
 import { filters, singleFilter } from "./FilterData";
-import { FormControlLabel, Radio } from "@mui/material";
-import FilterListIcon from "@mui/icons-material/FilterList";
+import FilterListIcon from '@mui/icons-material/FilterList';
 import { useLocation, useNavigate } from "react-router-dom";
-
 const sortOptions = [
-  { name: "Price: Low to High", href: "#", current: false },
-  { name: "Price: High to Low", href: "#", current: false },
+  { name: "Most Popular", href: "#", current: true },
+  { name: "Best Rating", href: "#", current: false },
 ];
 
 function classNames(...classes) {
@@ -32,69 +24,34 @@ function classNames(...classes) {
 
 export default function Product() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const location = useLocation();
+  const location = useLocation()
   const navigate = useNavigate();
-
-  // Initialize state for selected filters
-  const [selectedFilters, setSelectedFilters] = useState({});
-
-  // Parse query parameters on component mount
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const initialSelectedFilters = {};
-    filters.forEach((section) => {
-      section.options.forEach((option) => {
-        const paramValue = searchParams.get(option.value);
-        if (paramValue) {
-          initialSelectedFilters[option.value] = true;
-        }
-      });
-    });
-    setSelectedFilters(initialSelectedFilters);
-  }, [location.search]);
-
-  // Update selected filters in URL
-  const updateFiltersInUrl = () => {
-    const searchParams = new URLSearchParams();
-    Object.keys(selectedFilters).forEach((filter) => {
-      if (selectedFilters[filter]) {
-        searchParams.append(filter, "true");
+  const handleFitler = (value, sectionId) => {
+    const searchParams = new URLSearchParams(location.search)
+    let filterValue = searchParams.getAll(sectionId)
+    if(filterValue.length > 0 && filterValue[0].split(",").includes(value)){
+      filterValue = filterValue[0].split(",").filter((item) => item !== value);
+      if(filterValue.length=== 0){
+        searchParams.delete(sectionId)
       }
-    });
-    navigate(`${location.pathname}?${searchParams.toString()}`);
-  };
+    }
+    else{
+      filterValue.push(value)
+    }
+    if(filterValue.length > 0){
+      searchParams.set(sectionId,filterValue.join(","));
+      
+    } 
+    const query = searchParams.toString();
+      navigate({search:`?${query}`})
+  }
 
-  // Handle filter selection/deselection
-  const handleFilterChange = (event, sectionId) => {
-    const { checked, value } = event.target;
-    setSelectedFilters((prevFilters) => ({
-      ...prevFilters,
-      [value]: checked,
-    }));
-  };
-
-  useEffect(() => {
-    updateFiltersInUrl();
-  }, [selectedFilters]);
-
-  // Function to handle deselection of filters
-  const handleDeselectFilter = (filter) => {
-    setSelectedFilters((prevFilters) => {
-      const updatedFilters = { ...prevFilters };
-      delete updatedFilters[filter];
-      return updatedFilters;
-    });
-  };
-
-  // Radio Button Filter
-  const handleRadioFilterChange = (e, sectionId) => {
-    const value = e.target.value;
-    setSelectedFilters((prevFilters) => ({
-      ...prevFilters,
-      [sectionId]: value,
-    }));
-  };
-
+  const handelRedioFilterChange = (e,sectionId) =>{
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set(sectionId,e.target.value)
+    const query = searchParams.toString();
+    navigate({search:`?${query}`})
+  }
   return (
     <div className="bg-white">
       <div>
@@ -184,10 +141,7 @@ export default function Product() {
                                       name={`${section.id}[]`}
                                       defaultValue={option.value}
                                       type="checkbox"
-                                      checked={selectedFilters[option.value]}
-                                      onChange={(event) =>
-                                        handleFilterChange(event, section.id)
-                                      }
+                                      defaultChecked={option.checked}
                                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
                                     <label
@@ -211,12 +165,8 @@ export default function Product() {
           </Dialog>
         </Transition.Root>
 
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-         
-        <div
-            className="flex items-baseline justify-between border-b border-gray-200
-pb-6 pt-24"
-          >
+        <main className="mx-auto px-4 sm:px-6 lg:px-20">
+          <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
               New Arrivals
             </h1>
@@ -291,7 +241,14 @@ pb-6 pt-24"
             </h2>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5">
-              <div>
+              {/* Filters */}
+             <div>
+              <div  className=" flex py-10 justify-between items-center">
+                <h1 className=" text-lg opacity-50 font-bold">Filters</h1>
+                <FilterListIcon/>
+              </div>
+             
+             <form className="hidden lg:block">
                 {filters.map((section) => (
                   <Disclosure
                     as="div"
@@ -301,7 +258,7 @@ pb-6 pt-24"
                     {({ open }) => (
                       <>
                         <h3 className="-my-3 flow-root">
-                          <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
+                          <Disclosure.Button className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
                             <span className="font-medium text-gray-900">
                               {section.name}
                             </span>
@@ -321,26 +278,24 @@ pb-6 pt-24"
                           </Disclosure.Button>
                         </h3>
                         <Disclosure.Panel className="pt-6">
-                          <div className="space-y-6">
+                          <div className="space-y-4">
                             {section.options.map((option, optionIdx) => (
                               <div
                                 key={option.value}
                                 className="flex items-center"
                               >
                                 <input
+                                onChange={() =>handleFitler(option.value,section.id)}
                                   id={`filter-${section.id}-${optionIdx}`}
                                   name={`${section.id}[]`}
                                   defaultValue={option.value}
                                   type="checkbox"
-                                  checked={selectedFilters[option.value]}
-                                  onChange={(event) =>
-                                    handleFilterChange(event, section.id)
-                                  }
+                                  defaultChecked={option.checked}
                                   className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                 />
                                 <label
                                   htmlFor={`filter-${section.id}-${optionIdx}`}
-                                  className="ml-3 min-w-0 flex-1 text-gray-500"
+                                  className="ml-3 text-sm text-gray-600"
                                 >
                                   {option.label}
                                 </label>
@@ -352,6 +307,7 @@ pb-6 pt-24"
                     )}
                   </Disclosure>
                 ))}
+
                 {singleFilter.map((section) => (
                   <Disclosure
                     as="div"
@@ -360,8 +316,8 @@ pb-6 pt-24"
                   >
                     {({ open }) => (
                       <>
-                        <h3 className="-mx-2 -my-3 flow-root">
-                          <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
+                        <h3 className="-my-3 flow-root">
+                          <Disclosure.Button className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
                             <span className="font-medium text-gray-900">
                               {section.name}
                             </span>
@@ -381,70 +337,45 @@ pb-6 pt-24"
                           </Disclosure.Button>
                         </h3>
                         <Disclosure.Panel className="pt-6">
-                          <RadioGroup
-                            value={selectedFilters[section.id]}
-                            onChange={(value) =>
-                              setSelectedFilters({
-                                ...selectedFilters,
-                                [section.id]: value,
-                              })
-                            }
-                          >
-                            <div className="space-y-4">
-                              {section.options.map((option, optionIdx) => (
-                                <RadioGroup.Option
-                                  key={option.value}
-                                  value={option.value}
+                          <div className="space-y-4">
+                            {section.options.map((option, optionIdx) => (
+                              <div
+                                key={option.value}
+                                className="flex items-center"
+                              >
+                                <input
+                                onChange={(e)=>handelRedioFilterChange(e,section.id)}
+                                  id={`filter-${section.id}-${optionIdx}`}
+                                  name={`${section.id}`} // Removed the '[]' to make it a single selection
+                                  value={option.value} // Use 'value' instead of 'defaultValue'
+                                  type="radio" // Changed 'checkbox' to 'radio'
+                                  defaultChecked={option.checked}
+                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                />
+                                <label
+                                  htmlFor={`filter-${section.id}-${optionIdx}`}
+                                  className="ml-3 text-sm text-gray-900"
                                 >
-                                  {({ checked }) => (
-                                    <div className="flex items-center">
-                                      <Radio
-                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                        checked={
-                                          selectedFilters[section.id] ===
-                                          option.value
-                                        }
-                                        onChange={(e) =>
-                                          handleRadioFilterChange(e, section.id)
-                                        }
-                                        value={option.value}
-                                      />
-                                      <label
-                                        htmlFor={`filter-${section.id}-${optionIdx}`}
-                                        className="ml-3 min-w-0 flex-1 text-gray-500"
-                                      >
-                                        {option.label}
-                                      </label>
-                                    </div>
-                                  )}
-                                </RadioGroup.Option>
-                              ))}
-                            </div>
-                          </RadioGroup>
+                                  {option.label}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
                         </Disclosure.Panel>
                       </>
                     )}
-                  </
-                  Disclosure>
+                  </Disclosure>
                 ))}
-              </div>
+              </form>
+             </div>
+             
 
+              {/* Product grid */}
               <div className="lg:col-span-4 w-full">
-                {/* Displaying product cards */}
-                <div className="flex flex-wrap justify-center bg-white py-5">
-                  {/* Ensure mens_kurta is an array and not empty before mapping over it */}
-                  {Array.isArray(mens_kurta) && mens_kurta.length > 0 ? (
-                    mens_kurta.map((item, index) => (
-                      <div
-                        key={index}
-                        className="w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/4 px-4 mb-8"
-                      >
-                        <ProductCard Product={item} />
-                      </div>
-                    ))
-                  ) : (
-                    <p>No products found</p>
-                  )}
+                <div className=" flex flex-wrap justify-center bg-white py5">
+                  {mens_kurta.map((Item) => (
+                    <ProductCard Product={Item} />
+                  ))}
                 </div>
               </div>
             </div>
